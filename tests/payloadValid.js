@@ -4,6 +4,5 @@ module.exports = {
   organization: "Website Inc",
   location: "Atlanta",
   state: "Georgia",
-  country: "US",
-  kmsKeyId: "abcd1234"
+  country: "US"
 };

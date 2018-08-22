@@ -9,20 +9,7 @@ $ aws kms create-key --description "SSL Cert Requests Parameter Store"
 # note the KeyId for the next step
 ```
 
-## Invoke Lambda using AWS CLI
-
-```bash
-$ aws lambda invoke \
---invocation-type RequestResponse \
---function-name RequestCertificate \
---region us-east-1 \
---log-type Tail \
---payload '{"commonName":"website-dev.tld.com", "organizationUnit":"Web Team", "organization":"Website Inc", "location":"Atlanta", "state":"Georgia", "country":"US", "kmsKeyId": "abcd1234..."}' \
---profile website-security \
-output.txt
-```
-
-## Required IAM Policy
+## Create the following Lambda IAM Role/Policy
 
 ```json
 {
@@ -49,4 +36,21 @@ output.txt
     }
   ]
 }
+```
+
+## Upload the Lambda code
+
+Upload index.js Lambda code using AWS console or AWS CLI. Use the IAM role created above. Define environment variable `KMS_KEY_ID` = the KMS key ID created above.
+
+## Invoke Lambda using AWS CLI
+
+```bash
+$ aws lambda invoke \
+--invocation-type RequestResponse \
+--function-name RequestCertificate \
+--region us-east-1 \
+--log-type Tail \
+--payload '{"commonName":"website-dev.tld.com", "organizationUnit":"Web Team", "organization":"Website Inc", "location":"Atlanta", "state":"Georgia", "country":"US"}' \
+--profile website-security \
+output.txt
 ```

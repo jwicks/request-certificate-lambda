@@ -17,6 +17,11 @@ function execPromise(command) {
 }
 
 exports.handler = async (event, context, callback) => {
+  if (!process.env.KMS_KEY_ID) {
+    throw new ReferenceError("Missing environment variable KMS_KEY_ID");
+  }
+  const kmsKeyId = process.env.KMS_KEY_ID;
+
   console.log("Creating CSR for parameters:", event);
   const {
     commonName,
@@ -24,8 +29,7 @@ exports.handler = async (event, context, callback) => {
     organization,
     location,
     state,
-    country,
-    kmsKeyId
+    country
   } = event;
 
   if (
@@ -35,13 +39,12 @@ exports.handler = async (event, context, callback) => {
       organization &&
       location &&
       state &&
-      country &&
-      kmsKeyId
+      country
     )
   ) {
     return callback(
       new Error(
-        "Invalid payload parameters. Please specify: commonName, organizationUnit, organization, location, state, country, kmsKeyId"
+        "Invalid payload parameters. Please specify: commonName, organizationUnit, organization, location, state, country"
       )
     );
   }
