@@ -38,9 +38,14 @@ $ aws kms create-key --description "SSL Cert Requests Parameter Store"
 }
 ```
 
-## Upload the Lambda code
+## Create the Lambda
 
-Upload index.js Lambda code using AWS console or AWS CLI. Use the IAM role created above. Define environment variable `KMS_KEY_ID` = the KMS key ID created above.
+Upload index.js Lambda code using AWS console or AWS CLI using the following configuration:
+
+- Node.js 8.10
+- Define environment variable `KMS_KEY_ID` = the KMS key ID created above
+- Timeout 10 sec
+- Execution role: Use the IAM role created above
 
 ## Invoke Lambda using AWS CLI
 
