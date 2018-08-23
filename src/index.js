@@ -71,28 +71,35 @@ exports.handler = async (event, context, callback) => {
   const ssm = new AWS.SSM();
   const isoDate = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
 
-  // Store the private key in SSM
-  await ssm
-    .putParameter({
-      Name: `${commonName}.${isoDate}.key`,
-      Type: "SecureString",
-      Value: keyContent,
-      KeyId: kmsKeyId
-    })
-    .promise();
+  try {
+    // Store the private key in SSM
+    await ssm
+      .putParameter({
+        Name: `${commonName}.${isoDate}.key`,
+        Type: "SecureString",
+        Value: keyContent,
+        KeyId: kmsKeyId
+      })
+      .promise();
 
-  // Store the CSR in SSM
-  await ssm
-    .putParameter({
-      Name: `${commonName}.${isoDate}.csr`,
-      Type: "String",
-      Value: csrContent
-    })
-    .promise();
-
-  // Remove tmp files
-  fs.unlinkSync(`/tmp/${commonName}/${commonName}.key`);
-  fs.unlinkSync(`/tmp/${commonName}/${commonName}.csr`);
+    // Store the CSR in SSM
+    await ssm
+      .putParameter({
+        Name: `${commonName}.${isoDate}.csr`,
+        Type: "String",
+        Value: csrContent
+      })
+      .promise();
+  } catch (err) {
+    console.error("Error while storing SSL artifacts in SSM", err);
+    throw err; // raise error so that Lambda fails
+  } finally {
+    try {
+      // Remove tmp files
+      fs.unlinkSync(`/tmp/${commonName}/${commonName}.key`);
+      fs.unlinkSync(`/tmp/${commonName}/${commonName}.csr`);
+    } catch (err) {}
+  }
 
   // Respond with the CSR
   callback(null, csrContent);
