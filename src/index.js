@@ -3,6 +3,8 @@ const exec = require("child_process").exec;
 const fs = require("fs");
 const AWS = require("aws-sdk");
 
+const SSM_PARAM_PREFIX = "ssl-cert-request-";
+
 function execPromise(command) {
   return new Promise(function(resolve, reject) {
     exec(command, (error, stdout, stderr) => {
@@ -75,7 +77,7 @@ exports.handler = async (event, context, callback) => {
     // Store the private key in SSM
     await ssm
       .putParameter({
-        Name: `${commonName}.${isoDate}.key`,
+        Name: `${SSM_PARAM_PREFIX}${commonName}.${isoDate}.key`,
         Type: "SecureString",
         Value: keyContent,
         KeyId: kmsKeyId
@@ -85,7 +87,7 @@ exports.handler = async (event, context, callback) => {
     // Store the CSR in SSM
     await ssm
       .putParameter({
-        Name: `${commonName}.${isoDate}.csr`,
+        Name: `${SSM_PARAM_PREFIX}${commonName}.${isoDate}.csr`,
         Type: "String",
         Value: csrContent
       })
